@@ -2,7 +2,7 @@ from enum import Enum
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 import hashlib
-from auth.jwt_token import jwt_encode
+from ..auth.jwt_token import jwt_encode
 
 
 class UserRole(Enum):

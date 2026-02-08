@@ -1,10 +1,12 @@
 import os
+import dotenv
 import base64
 import json
 import hmac
 import hashlib
 from datetime import datetime, timezone
 
+dotenv.load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY").encode("utf-8")
 
 
@@ -28,9 +30,7 @@ def jwt_encode(payload: dict[str, str]):
 
     message = f"{header_b64}.{payload_b64}"
 
-    signature = hmac.new(
-        SECRET_KEY, message.encode("utf-8"), hashlib.sha256
-    ).digest()
+    signature = hmac.new(SECRET_KEY, message.encode("utf-8"), hashlib.sha256).digest()
     signature_b64 = base64url_encode(signature)
 
     jwt_token = f"{message}.{signature_b64}"

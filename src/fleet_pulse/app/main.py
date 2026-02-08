@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from models.user import User, UserRole
+from ..models.user import User, UserRole
 
 # Seed users
 users: list[User] = [
