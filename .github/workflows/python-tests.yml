@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
 
     steps:
       - name: Check out code
