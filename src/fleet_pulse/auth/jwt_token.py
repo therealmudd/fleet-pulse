@@ -13,8 +13,10 @@ SECRET_KEY = os.getenv("AUTH_SECRET_KEY").encode("utf-8")
 class JWTInvalidTokenError(Exception):
     pass
 
+
 class JWTExpiredTokenError(Exception):
     pass
+
 
 def base64url_encode(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("utf-8")
