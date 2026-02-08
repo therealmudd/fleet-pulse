@@ -1,12 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Flask, app, request, jsonify
+from ..auth.decorators import requires_roles
 from ..models.user import User, UserRole
 
 # Seed users
 users: list[User] = [
-    User("admin@pulsefleet.com", "", UserRole.ADMIN),
-    User("inactive@pulsefleet.com", "", UserRole.DRIVER, active=False),
-    User("dispatcher@pulsefleet.com", "", UserRole.DISPATCHER),
-    User("driver@pulsefleet.com", "", UserRole.DRIVER),
+    User("admin@fleetpulse.com", "", UserRole.ADMIN),
+    User("inactive@fleetpulse.com", "", UserRole.DRIVER, active=False),
+    User("dispatcher@fleetpulse.com", "", UserRole.DISPATCHER),
+    User("driver@fleetpulse.com", "", UserRole.DRIVER),
 ]
 
 
@@ -26,10 +27,10 @@ def create_app():
             return jsonify({"message": "Body must be json"}), 400
 
         data = request.get_json()
-        try:
-            email = data["email"]
-            password = data["password"]
-        except KeyError:
+        email = data.get("email")
+        password = data.get("password")
+
+        if email is None or password is None:
             return {"message": "Malformed request"}, 400
 
         user = get_user(email)
@@ -49,6 +50,21 @@ def create_app():
             )
         else:
             return {"message": "Invalid credentials"}, 401
+
+    @app.route("/admin/health", methods=["GET"])
+    @requires_roles([UserRole.ADMIN])
+    def admin_health():
+        return {"message": "Success!"}, 200
+
+    @app.route("/dispatch/jobs", methods=["GET"])
+    @requires_roles([UserRole.ADMIN, UserRole.DISPATCHER])
+    def dispatch_jobs():
+        return {"message": "Success!"}, 200
+
+    @app.route("/driver/jobs", methods=["GET"])
+    @requires_roles([UserRole.DRIVER])
+    def driver_jobs():
+        return {"message": "Success!"}, 200
 
     @app.route("/")
     def main():
