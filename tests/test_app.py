@@ -27,3 +27,31 @@ def test_login(client, email_prefix, password, expected_message, expected_status
 
     assert response.json["message"] == expected_json["message"]
     assert response.status_code == expected_status
+
+
+def test_admin_health_no_token(client):
+    response = client.get("/admin/health")
+
+    assert response.json["message"] == "Missing Authorization header"
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    "email_prefix, password, expected_message, expected_status",
+    [
+        ("admin", "", "Success!", 200),
+        ("dispatcher", "", "Unauthorized user", 403),
+        ("driver", "", "Unauthorized user", 403),
+    ],
+)
+def test_admin_health(
+    client, email_prefix, password, expected_message, expected_status
+):
+    body = prep_creds(email_prefix, password)
+    response = client.post("/auth/login", json=body)
+    token = response.json.get("token")
+
+    response = client.get("/admin/health", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.json["message"] == expected_message
+    assert response.status_code == expected_status
