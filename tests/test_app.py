@@ -80,8 +80,8 @@ def test_verify_jwt(client, payload, expected_message, expected_status):
     "email_prefix, password, expected_message, expected_status",
     [
         ("admin", "", "Success!", 200),
-        ("dispatcher", "", "Unauthorized user", 403),
-        ("driver", "", "Unauthorized user", 403),
+        ("dispatcher", "", "Unauthorized user", 401),
+        ("driver", "", "Unauthorized user", 401),
     ],
 )
 def test_admin_health(
