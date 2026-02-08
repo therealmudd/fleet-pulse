@@ -10,6 +10,10 @@ dotenv.load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY").encode("utf-8")
 
 
+class JWTError(Exception):
+    pass
+
+
 def base64url_encode(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("utf-8")
 
@@ -39,7 +43,10 @@ def jwt_encode(payload: dict[str, str]):
 
 
 def verify_jwt(token: str) -> dict:
-    header_b64, payload_b64, signature_b64 = token.split(".")
+    try:
+        header_b64, payload_b64, signature_b64 = token.split(".")
+    except ValueError:
+        raise JWTError("Invalid token")
 
     message = f"{header_b64}.{payload_b64}"
 
@@ -48,13 +55,13 @@ def verify_jwt(token: str) -> dict:
     ).digest()
 
     if not hmac.compare_digest(base64url_encode(expected_signature), signature_b64):
-        raise ValueError("Invalid signature")
+        raise JWTError("Invalid signature")
 
     payload_json = base64url_decode(payload_b64)
     payload = json.loads(payload_json)
 
     now = int(datetime.now(tz=timezone.utc).timestamp())
     if payload.get("exp") and now > payload["exp"]:
-        raise ValueError("Token expired")
+        raise JWTError("Token expired")
 
     return payload
