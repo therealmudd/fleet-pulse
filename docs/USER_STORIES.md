@@ -238,22 +238,3 @@
 * Logs include actor, timestamp, action, entity
 
 ---
-
-## 🧑‍🏫 How I’d Start This With a Mentee
-
-**Sprint 1**
-
-* US-001 → US-006
-  (Feels slow, but builds foundation)
-
-**Sprint 2**
-
-* US-007 → US-010
-  (This is where things break 😈)
-
-**Sprint 3**
-
-* US-011 → US-015
-  (Professional-level thinking kicks in)
-
----
