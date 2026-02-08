@@ -1,33 +1,28 @@
 import pytest
 
 
-user_credentials_cases = [
-    (
-        {"email": "admin@pulsefleet.com", "password": ""},
-        {"message": "Successfully generated token"},
-        200,
-    ),
-    (
-        {"email": "admin@pulsefleet.com", "password": "wrong-password"},
-        {"message": "Invalid credentials"},
-        401,
-    ),
-    (
-        {"email": "inactive@pulsefleet.com", "password": ""},
-        {"message": "Inactive user"},
-        403,
-    ),
-    (
-        {"email": "unknown@pulsefleet.com", "password": ""},
-        {"message": "Invalid credentials"},
-        401,
-    ),
-    ({}, {"message": "Malformed request"}, 400),
-]
+def prep_creds(email_prefix: str, password: str) -> dict[str, str]:
+    return {"email": f"{email_prefix}@fleetpulse.com", "password": password}
 
 
-@pytest.mark.parametrize("body, expected_json, expected_status", user_credentials_cases)
-def test_login(client, body, expected_json, expected_status):
+def prep_response(message: str, status: int) -> tuple[dict[str, str], int]:
+    return {"message": message}, status
+
+
+@pytest.mark.parametrize(
+    "email_prefix, password, expected_message, expected_status",
+    [
+        ("admin", "", "Successfully generated token", 200),
+        ("admin", "wrong-password", "Invalid credentials", 401),
+        ("inactive", "", "Inactive user", 403),
+        ("unknown", "", "Invalid credentials", 401),
+        ("admin", None, "Malformed request", 400),
+    ],
+)
+def test_login(client, email_prefix, password, expected_message, expected_status):
+    body = prep_creds(email_prefix, password)
+    expected_json, expected_status = prep_response(expected_message, expected_status)
+
     response = client.post("/auth/login", json=body)
 
     assert response.json["message"] == expected_json["message"]

@@ -3,10 +3,10 @@ from ..models.user import User, UserRole
 
 # Seed users
 users: list[User] = [
-    User("admin@pulsefleet.com", "", UserRole.ADMIN),
-    User("inactive@pulsefleet.com", "", UserRole.DRIVER, active=False),
-    User("dispatcher@pulsefleet.com", "", UserRole.DISPATCHER),
-    User("driver@pulsefleet.com", "", UserRole.DRIVER),
+    User("admin@fleetpulse.com", "", UserRole.ADMIN),
+    User("inactive@fleetpulse.com", "", UserRole.DRIVER, active=False),
+    User("dispatcher@fleetpulse.com", "", UserRole.DISPATCHER),
+    User("driver@fleetpulse.com", "", UserRole.DRIVER),
 ]
 
 
@@ -26,10 +26,10 @@ def create_app():
             return jsonify({"message": "Body must be json"}), 400
 
         data = request.get_json()
-        try:
-            email = data["email"]
-            password = data["password"]
-        except KeyError:
+        email = data.get("email")
+        password = data.get("password")
+
+        if email is None or password is None:
             return {"message": "Malformed request"}, 400
 
         user = get_user(email)
