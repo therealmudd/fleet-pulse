@@ -1,6 +1,6 @@
 from functools import wraps
-from flask import request, jsonify
-from .jwt_token import verify_jwt, JWTError
+from flask import request, g, jsonify
+from .jwt_token import verify_jwt, JWTInvalidTokenError, JWTExpiredTokenError
 from ..models.user import UserRole
 
 
@@ -15,16 +15,18 @@ def requires_roles(roles: list[UserRole]):
             try:
                 _, token = auth_header.split()
                 payload = verify_jwt(token)
-                request.user_id = payload["sub"]
-                request.user_role = payload["role"]
-                user_role = UserRole[payload["role"]]
-            except (KeyError, ValueError, JWTError):
-                return jsonify({"message": "Invalid token"}), 403
+                g.user_id = payload["sub"]
+                g.user_role = payload["role"]
+                user_role = UserRole(payload["role"])
+            except (KeyError, ValueError, JWTInvalidTokenError):
+                return jsonify({"message": "Invalid token"}), 401
+            except JWTExpiredTokenError:
+                return jsonify({"message": "Token expired"}), 401
 
             if user_role in roles:
                 return func(*args, **kwargs)
             else:
-                return jsonify({"message": "Unauthorized user"}), 403
+                return jsonify({"message": "Unauthorized user"}), 401
 
         return wrapped
 

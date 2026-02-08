@@ -41,7 +41,7 @@ class User:
         return jwt_encode(
             {
                 "sub": self.id,
-                "role": self.role.name,
+                "role": self.role.value,
                 "iat": int(datetime.now(tz=timezone.utc).timestamp()),
                 "exp": int(
                     (datetime.now(tz=timezone.utc) + timedelta(hours=1)).timestamp()
