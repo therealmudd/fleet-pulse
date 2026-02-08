@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify
-from fleet_pulse.auth.decorators import requires_roles
+from flask import Flask, app, request, jsonify
+from ..auth.decorators import requires_roles
 from ..models.user import User, UserRole
 
 # Seed users
@@ -51,18 +51,18 @@ def create_app():
         else:
             return {"message": "Invalid credentials"}, 401
 
-    @requires_roles([UserRole.ADMIN])
     @app.route("/admin/health", methods=["GET"])
+    @requires_roles([UserRole.ADMIN])
     def admin_health():
         return {"message": "Success!"}, 200
 
-    @requires_roles([UserRole.ADMIN, UserRole.DISPATCHER])
     @app.route("/dispatch/jobs", methods=["GET"])
+    @requires_roles([UserRole.ADMIN, UserRole.DISPATCHER])
     def dispatch_jobs():
         return {"message": "Success!"}, 200
 
-    @requires_roles([UserRole.DRIVER])
     @app.route("/driver/jobs", methods=["GET"])
+    @requires_roles([UserRole.DRIVER])
     def driver_jobs():
         return {"message": "Success!"}, 200
 
