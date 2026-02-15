@@ -11,13 +11,25 @@ class UserRole(Enum):
     DRIVER = "driver"
 
 
+class AccountStatus(Enum):
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    DEACTIVATED = "deactivated"
+
+
+class DriverStatus(Enum):
+    AVAILABLE = "available"
+    ON_JOB = "on_job"
+    OFFLINE = "offline"
+
+
 class User:
     def __init__(
         self,
         email: str,
         password: str,
         role: UserRole | None = None,
-        active: bool = True,
+        active: AccountStatus = AccountStatus.ACTIVE,
     ):
         self.id = str(uuid4())[:7]
         self.email = email
@@ -64,3 +76,12 @@ class User:
     def update_role(self, new_role):
         self.role = new_role
         self._update()
+
+
+class Driver(User):
+    def __init__(self, email: str, password: str, active: bool = True):
+        super().__init__(email, password, UserRole.DRIVER, active)
+
+        self.full_name = ""
+        self.phone = ""
+        self.status = DriverStatus.OFFLINE
